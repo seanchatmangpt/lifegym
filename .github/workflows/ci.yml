@@ -1,0 +1,53 @@
+name: LifeGym exact-head court
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Assert exact subject
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install exact GymAct consumer capsule
+        run: python -m pip install -e '.[dev]'
+      - name: Refuse mockist proof
+        shell: bash
+        run: "! grep -nE 'unittest\\.mock|Mock\\(|MagicMock|patch\\(|monkeypatch' tests/test_lifegym.py"
+      - name: Execute conformance and provider courts
+        run: |
+          lifegym conform
+          python -m pytest -q tests/test_lifegym.py
+          python -m compileall -q src tests
+      - name: Verify GymAct profile and RDF projection drift
+        run: |
+          gymact export-profile /tmp/gymact-profile
+          cmp /tmp/gymact-profile/profile.shacl.ttl ggen/lifegym-world-pack/shapes/profile.shacl.ttl
+          lifegym export-rdf /tmp/lifegym-procedures.ttl
+          python - <<'PY'
+          from rdflib import Graph
+          procedures = Graph().parse("/tmp/lifegym-procedures.ttl", format="turtle")
+          world = Graph().parse("ggen/lifegym-world-pack/ontology.ttl", format="turtle")
+          assert len(procedures) == 864
+          assert len(world) > 0
+          PY
+          python - <<'PY'
+          import tomllib
+          tomllib.load(open("ggen/lifegym-world-pack/pack.toml", "rb"))
+          PY

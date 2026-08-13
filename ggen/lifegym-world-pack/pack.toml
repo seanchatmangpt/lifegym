@@ -1,0 +1,4 @@
+[pack]
+name = "lifegym-world-pack"
+version = "26.8.12"
+description = "GymAct consumer projection of the deterministic LifeGym procedure surface"

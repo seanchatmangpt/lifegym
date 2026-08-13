@@ -1,0 +1,54 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
+@prefix odrl: <http://www.w3.org/ns/odrl/2/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<urn:lifegym:world-profile>
+    a prov:Entity ;
+    dct:title "LifeGym deterministic living-world profile" ;
+    dct:identifier "lifegym-v26.8.12" .
+
+<urn:lifegym:authority-policy>
+    a odrl:Policy ;
+    dct:title "Consequential DO requires external GymAct authority" .
+
+<urn:lifegym:quality:tasks> a dqv:QualityMeasurement ; dct:identifier "tasks" ; dct:extent "200" .
+<urn:lifegym:quality:procedures> a dqv:QualityMeasurement ; dct:identifier "procedures" ; dct:extent "288" .
+<urn:lifegym:quality:events> a dqv:QualityMeasurement ; dct:identifier "events" ; dct:extent "7453" .
+<urn:lifegym:quality:checks> a dqv:QualityMeasurement ; dct:identifier "checks" ; dct:extent "12261" .
+
+<urn:lifegym:domain:travel> a skos:Concept ; skos:prefLabel "travel" .
+<urn:lifegym:domain:finance> a skos:Concept ; skos:prefLabel "finance" .
+<urn:lifegym:domain:litigation> a skos:Concept ; skos:prefLabel "litigation" .
+<urn:lifegym:domain:renovation> a skos:Concept ; skos:prefLabel "renovation" .
+<urn:lifegym:domain:career> a skos:Concept ; skos:prefLabel "career" .
+<urn:lifegym:domain:fitness> a skos:Concept ; skos:prefLabel "fitness" .
+<urn:lifegym:domain:exam-preparation> a skos:Concept ; skos:prefLabel "exam-preparation" .
+<urn:lifegym:domain:rental> a skos:Concept ; skos:prefLabel "rental" .
+<urn:lifegym:domain:shopping> a skos:Concept ; skos:prefLabel "shopping" .
+<urn:lifegym:domain:team-building> a skos:Concept ; skos:prefLabel "team-building" .
+
+<urn:lifegym:service:email> a dcat:DataService ; dct:identifier "email" .
+<urn:lifegym:service:calendar> a dcat:DataService ; dct:identifier "calendar" .
+<urn:lifegym:service:notes> a dcat:DataService ; dct:identifier "notes" .
+<urn:lifegym:service:notification_hub> a dcat:DataService ; dct:identifier "notification_hub" .
+<urn:lifegym:service:banking> a dcat:DataService ; dct:identifier "banking" .
+<urn:lifegym:service:credit_card> a dcat:DataService ; dct:identifier "credit_card" .
+<urn:lifegym:service:brokerage> a dcat:DataService ; dct:identifier "brokerage" .
+<urn:lifegym:service:flight> a dcat:DataService ; dct:identifier "flight" .
+<urn:lifegym:service:hotel> a dcat:DataService ; dct:identifier "hotel" .
+<urn:lifegym:service:rail> a dcat:DataService ; dct:identifier "rail" .
+<urn:lifegym:service:car> a dcat:DataService ; dct:identifier "car" .
+<urn:lifegym:service:maps> a dcat:DataService ; dct:identifier "maps" .
+<urn:lifegym:service:weather> a dcat:DataService ; dct:identifier "weather" .
+<urn:lifegym:service:visa_advisories> a dcat:DataService ; dct:identifier "visa_advisories" .
+<urn:lifegym:service:ecommerce> a dcat:DataService ; dct:identifier "ecommerce" .
+<urn:lifegym:service:delivery_logistics> a dcat:DataService ; dct:identifier "delivery_logistics" .
+<urn:lifegym:service:listings> a dcat:DataService ; dct:identifier "listings" .
+<urn:lifegym:service:reviews> a dcat:DataService ; dct:identifier "reviews" .
+<urn:lifegym:service:content_community> a dcat:DataService ; dct:identifier "content_community" .
+<urn:lifegym:service:legal_search> a dcat:DataService ; dct:identifier "legal_search" .
+<urn:lifegym:service:job_board> a dcat:DataService ; dct:identifier "job_board" .
+<urn:lifegym:service:health_tracking> a dcat:DataService ; dct:identifier "health_tracking" .
