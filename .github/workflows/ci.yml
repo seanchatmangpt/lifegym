@@ -22,47 +22,39 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
-      - name: Materialize exact GymAct source
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
-        with:
-          repository: seanchatmangpt/gymact
-          ref: 5a40c8f402aeb14699e216e17b2ef7aae9f0bc8f
-          path: _deps/gymact
-          persist-credentials: false
-      - name: Assert GymAct source identity
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git -C _deps/gymact rev-parse HEAD)" = "5a40c8f402aeb14699e216e17b2ef7aae9f0bc8f"
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: "3.12"
-      - name: Install exact source capsule
+      - name: Install LifeGym verification capsule
         run: |
-          python -m pip install -e _deps/gymact
           python -m pip install pytest==8.3.5 rdflib==7.5.0
           python -m pip install -e . --no-deps
       - name: Refuse mockist proof
         shell: bash
         run: "! grep -nE 'unittest\\.mock|Mock\\(|MagicMock|patch\\(|monkeypatch' tests/test_lifegym.py"
-      - name: Execute conformance and provider courts
+      - name: Execute LifeGym conformance courts
         run: |
           lifegym conform
           python -m pytest -q tests/test_lifegym.py
           python -m compileall -q src tests
-      - name: Verify GymAct profile and RDF projection drift
+      - name: Verify pinned GymAct profile bytes and RDF projection
         run: |
-          gymact export-profile /tmp/gymact-profile
-          cmp /tmp/gymact-profile/profile.shacl.ttl ggen/lifegym-world-pack/shapes/profile.shacl.ttl
-          lifegym export-rdf /tmp/lifegym-procedures.ttl
           python - <<'PY'
+          import hashlib
+          import tomllib
+          from pathlib import Path
           from rdflib import Graph
-          procedures = Graph().parse("/tmp/lifegym-procedures.ttl", format="turtle")
+
+          shape = Path("ggen/lifegym-world-pack/shapes/profile.shacl.ttl")
+          assert hashlib.sha256(shape.read_bytes()).hexdigest() == "1b64989f8097c58bdada3ad7cb793098288d042f1c4ded6cbfefd6e3af0022f5"
+          procedures = Graph().parse(data=__import__("lifegym.factory", fromlist=["export_rdf_text"]).export_rdf_text(), format="turtle")
           world = Graph().parse("ggen/lifegym-world-pack/ontology.ttl", format="turtle")
           assert len(procedures) == 864
           assert len(world) > 0
-          PY
-          python - <<'PY'
-          import tomllib
           tomllib.load(open("ggen/lifegym-world-pack/pack.toml", "rb"))
           PY
+      - name: Record cross-repository crown boundary
+        shell: bash
+        run: |
+          test "$(git config --get remote.origin.url)" != "https://github.com/seanchatmangpt/gymact"
+          echo "BLOCKED:CROSS_REPO_PRIVATE_GYMACT_AUTHORITY"
