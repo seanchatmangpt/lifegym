@@ -24,10 +24,9 @@ jobs:
           ggen_bin="$(find /tmp/ggen-bin -type f -name ggen -perm -111 | head -n1)"
           echo "GGEN_BIN=$ggen_bin" >> "$GITHUB_ENV"
       - name: Generate twice and refuse non-idempotency
-        working-directory: ggen/lifegym-world-pack
         run: |
           "$GGEN_BIN" --version
           timeout 5s "$GGEN_BIN" sync run
-          cp -r generated /tmp/generated.first
+          cp -r src /tmp/generated.first
           timeout 5s "$GGEN_BIN" sync run
-          diff -r /tmp/generated.first generated
+          diff -r /tmp/generated.first src
