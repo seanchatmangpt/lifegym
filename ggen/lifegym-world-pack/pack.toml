@@ -1,0 +1,4 @@
+[pack]
+name = "lifegym-world-pack"
+version = "26.8.12"
+description = "ggen manufacture of LifeGym's deterministic living-world profile: 10 domains, 22 services, benchmark-envelope quality facts, and the external GymAct authority policy; provider procedure execution remains a separate runtime concern"

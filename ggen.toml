@@ -1,0 +1,11 @@
+[project]
+name = "lifegym-world"
+
+[ontology]
+source = "ggen/lifegym-world-pack/ontology.ttl"
+
+[packs]
+lifegym-world-pack = { path = "ggen/lifegym-world-pack" }
+
+[templates]
+dir = "templates"
