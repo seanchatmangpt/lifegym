@@ -1,0 +1,5 @@
+
+# ggen local runtime artifacts (not reproducible content)
+/.ggen/
+/.ggen-v2/
+/ggen.lock
