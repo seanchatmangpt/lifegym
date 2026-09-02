@@ -3,7 +3,11 @@ to: "src/lifegym_world_catalog.rs"
 sparql:
   domains: |
     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    SELECT ?id WHERE { ?domain a skos:Concept ; skos:prefLabel ?id . } ORDER BY ?id
+    SELECT ?id WHERE {
+      ?domain a skos:Concept ;
+              skos:inScheme <urn:lifegym:scheme:benchmark-domain> ;
+              skos:prefLabel ?id .
+    } ORDER BY ?id
   services: |
     PREFIX dcat: <http://www.w3.org/ns/dcat#>
     PREFIX dct: <http://purl.org/dc/terms/>
