@@ -13,6 +13,52 @@ RECEIPT     GymAct evidence/verification/replay; no LifeGym-local ambient execut
 
 LifeGym owns **world semantics**. GymAct owns **authority and consequence**. ggen owns **manufacture**. DfCM preserves the reversible possibility topology until an explicit DO cut.
 
+## Personal routine simulation
+
+`scenario="personal-routine"` materializes an isolated counterfactual day world for a caller-supplied subject profile. It is intentionally a **simulation surface, not a clinical engine and not an external automation surface**. The public repository carries only generic semantics and synthetic fixtures; real subject telemetry belongs in a caller-owned private capsule and must not be committed here.
+
+The initial executable slice models:
+
+- admitted observations such as wake time or caller-derived telemetry features;
+- configurable wake target/tolerance without inventing a tolerance when none is supplied;
+- water and sunlight accumulation;
+- calendar review and day-plan adjustment;
+- leaving home, chores, shutdown, and optional nighttime-phone policy;
+- external circumstances as exogenous world events with no ambient execution authority;
+- immutable work-mode/direct-code boundaries supplied by the profile;
+- a derived `UNKNOWN | PARTIAL_ALIVE | ALIVE` routine standing over configured observable goals.
+
+Example materialization input (synthetic only):
+
+```python
+from gymact.models import MaterializationIntent
+
+intent = MaterializationIntent(
+    provider="lifegym",
+    scenario="personal-routine",
+    config={
+        "profile": {
+            "wake_target": "08:00",
+            "work_mode": "software_manufacture",
+            "direct_code_allowed": False,
+            "mission_tags": ["routine-stability"],
+            "targets": {
+                "wake_tolerance_minutes": 15,
+                "water_ml": 500,
+                "sunlight_minutes": 20,
+                "calendar_reviewed": True,
+                "outside_home": True,
+                "shutdown": True,
+                "phone_policy": "avoid_after_shutdown",
+            },
+        },
+        "initial": {"day": "2030-01-02"},
+    },
+)
+```
+
+Every change inside this environment is synthetic. A planner may roll out any number of reversible candidate days, but connecting a selected intent to a real calendar, notification system, phone, location service, or other consequential surface remains a separate GymAct/BRCE DO with its own authority and receipt.
+
 ## v26.8.12 conformance envelope
 
 The deterministic reference factory manufactures, without vendoring VibeLifeBench content:

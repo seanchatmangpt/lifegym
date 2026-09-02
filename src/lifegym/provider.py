@@ -9,6 +9,7 @@ from uuid import uuid4
 from gymact.models import Capability, Consequence
 
 from .factory import DO, EVENT_MUTATION, ProcedureSpec, TaskSpec, procedures, tasks
+from .personal_routine import PERSONAL_ROUTINE_SCENARIO, PersonalRoutineEnvironment
 
 
 class LifeGymEnvironment:
@@ -130,7 +131,10 @@ class LifeGymProvider:
         *,
         scenario: str | None,
         config: dict[str, Any],
-    ) -> LifeGymEnvironment:
+    ) -> LifeGymEnvironment | PersonalRoutineEnvironment:
+        if scenario == PERSONAL_ROUTINE_SCENARIO:
+            return PersonalRoutineEnvironment.from_config(config)
+
         task_id = str(config.get("task_id", scenario or self._ordered[0].task_id))
         try:
             task = self._tasks[task_id]

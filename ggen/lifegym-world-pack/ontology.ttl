@@ -19,16 +19,40 @@
 <urn:lifegym:quality:events> a dqv:QualityMeasurement ; dct:identifier "events" ; dct:extent "7453" .
 <urn:lifegym:quality:checks> a dqv:QualityMeasurement ; dct:identifier "checks" ; dct:extent "12261" .
 
-<urn:lifegym:domain:travel> a skos:Concept ; skos:prefLabel "travel" .
-<urn:lifegym:domain:finance> a skos:Concept ; skos:prefLabel "finance" .
-<urn:lifegym:domain:litigation> a skos:Concept ; skos:prefLabel "litigation" .
-<urn:lifegym:domain:renovation> a skos:Concept ; skos:prefLabel "renovation" .
-<urn:lifegym:domain:career> a skos:Concept ; skos:prefLabel "career" .
-<urn:lifegym:domain:fitness> a skos:Concept ; skos:prefLabel "fitness" .
-<urn:lifegym:domain:exam-preparation> a skos:Concept ; skos:prefLabel "exam-preparation" .
-<urn:lifegym:domain:rental> a skos:Concept ; skos:prefLabel "rental" .
-<urn:lifegym:domain:shopping> a skos:Concept ; skos:prefLabel "shopping" .
-<urn:lifegym:domain:team-building> a skos:Concept ; skos:prefLabel "team-building" .
+<urn:lifegym:scheme:benchmark-domain>
+    a skos:ConceptScheme ;
+    skos:prefLabel "LifeGym benchmark domains" .
+
+<urn:lifegym:scheme:scenario>
+    a skos:ConceptScheme ;
+    skos:prefLabel "LifeGym scenarios" .
+
+<urn:lifegym:scheme:personal-routine-facet>
+    a skos:ConceptScheme ;
+    skos:prefLabel "Personal routine simulation facets" .
+
+<urn:lifegym:domain:travel> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "travel" .
+<urn:lifegym:domain:finance> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "finance" .
+<urn:lifegym:domain:litigation> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "litigation" .
+<urn:lifegym:domain:renovation> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "renovation" .
+<urn:lifegym:domain:career> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "career" .
+<urn:lifegym:domain:fitness> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "fitness" .
+<urn:lifegym:domain:exam-preparation> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "exam-preparation" .
+<urn:lifegym:domain:rental> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "rental" .
+<urn:lifegym:domain:shopping> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "shopping" .
+<urn:lifegym:domain:team-building> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:benchmark-domain> ; skos:prefLabel "team-building" .
+
+<urn:lifegym:scenario:personal-routine> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:scenario> ; skos:prefLabel "personal routine" .
+
+<urn:lifegym:concept:wake-target> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "wake target" .
+<urn:lifegym:concept:admitted-observation> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "admitted observation" .
+<urn:lifegym:concept:calendar-review> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "calendar review" .
+<urn:lifegym:concept:day-adjustment> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "day adjustment" .
+<urn:lifegym:concept:sunlight-exposure> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "sunlight exposure" .
+<urn:lifegym:concept:outside-home> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "outside home" .
+<urn:lifegym:concept:shutdown-boundary> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "shutdown boundary" .
+<urn:lifegym:concept:external-circumstance> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "external circumstance" .
+<urn:lifegym:concept:counterfactual-day> a skos:Concept ; skos:inScheme <urn:lifegym:scheme:personal-routine-facet> ; skos:prefLabel "counterfactual day" .
 
 <urn:lifegym:service:email> a dcat:DataService ; dct:identifier "email" .
 <urn:lifegym:service:calendar> a dcat:DataService ; dct:identifier "calendar" .

@@ -29,6 +29,9 @@ jobs:
         run: |
           python -m pip install pytest==8.3.5 rdflib==7.5.0
           python -m pip install -e . --no-deps
+      - name: Install exact pinned GymAct integration
+        run: |
+          python -m pip install "git+https://github.com/seanchatmangpt/gymact.git@5a40c8f402aeb14699e216e17b2ef7aae9f0bc8f"
       - name: Refuse mockist proof
         shell: bash
         run: "! grep -nE 'unittest\\.mock|Mock\\(|MagicMock|patch\\(|monkeypatch' tests/test_lifegym.py"
@@ -51,10 +54,13 @@ jobs:
           world = Graph().parse("ggen/lifegym-world-pack/ontology.ttl", format="turtle")
           assert len(procedures) == 864
           assert len(world) > 0
+          metadata = tomllib.load(open("pyproject.toml", "rb"))
+          dependency = next(item for item in metadata["project"]["dependencies"] if item.startswith("gymact "))
+          assert dependency.endswith("@5a40c8f402aeb14699e216e17b2ef7aae9f0bc8f")
           tomllib.load(open("ggen/lifegym-world-pack/pack.toml", "rb"))
           PY
-      - name: Record cross-repository crown boundary
+      - name: Record cross-repository execution boundary
         shell: bash
         run: |
-          test "$(git config --get remote.origin.url)" != "https://github.com/seanchatmangpt/gymact"
-          echo "BLOCKED:CROSS_REPO_PRIVATE_GYMACT_AUTHORITY"
+          set -euo pipefail
+          python -c 'import gymact, lifegym; print("PINNED_GYMACT_INTEGRATION_EXECUTED")'
