@@ -143,3 +143,82 @@ def test_gymact_provider_authority_receipts_and_replay() -> None:
         assert refused.receipt.reason == "BRCE_EXECUTION_GRANT_REQUIRED"
 
     asyncio.run(court())
+
+
+def test_personal_routine_scenario_is_bounded_receipted_and_counterfactual() -> None:
+    pytest.importorskip("gymact")
+    from gymact.authority import AllowListAuthorityResolver
+    from gymact.models import ActuationIntent, MaterializationIntent, Standing
+    from gymact.runtime import GymAct
+    from lifegym.provider import LifeGymProvider
+
+    async def court() -> None:
+        authority_ref = "urn:lifegym:personal-routine:test-authority"
+        runtime = GymAct(authority_resolver=AllowListAuthorityResolver({authority_ref}))
+        runtime.register_provider(LifeGymProvider())
+        created = await runtime.materialize(
+            MaterializationIntent(
+                provider="lifegym",
+                scenario="personal-routine",
+                config={
+                    "profile": {
+                        "wake_target": "08:00",
+                        "work_mode": "software_manufacture",
+                        "direct_code_allowed": False,
+                        "mission_tags": ["routine-stability"],
+                        "targets": {
+                            "wake_tolerance_minutes": 15,
+                            "water_ml": 500,
+                            "sunlight_minutes": 20,
+                            "calendar_reviewed": True,
+                            "outside_home": True,
+                            "shutdown": True,
+                            "phone_policy": "avoid_after_shutdown",
+                        },
+                    },
+                    "initial": {"day": "2030-01-02"},
+                },
+                idempotency_key="personal-routine-materialize-1",
+            )
+        )
+        assert created.accepted and created.standing == Standing.ALIVE
+        assert created.episode is not None and created.observation is not None
+        episode_id = created.episode.episode_id
+        state = created.observation.state
+        assert state["work_mode"] == "software_manufacture"
+        assert state["direct_code_allowed"] is False
+        assert state["derived"]["routine_standing"] == "PARTIAL_ALIVE"
+
+        capabilities = {cap.binding: cap for cap in runtime.capabilities(episode_id)}
+
+        async def do(binding: str, payload: dict[str, object], serial: int) -> None:
+            result = await runtime.act(
+                ActuationIntent(
+                    episode_id=episode_id,
+                    capability=capabilities[binding].iri,
+                    payload=payload,
+                    authority_ref=authority_ref,
+                    idempotency_key=f"personal-routine-act-{serial}",
+                )
+            )
+            assert result.accepted and result.standing == Standing.ALIVE
+
+        await do("record_observation", {"name": "wake_time", "value": "08:10"}, 1)
+        await do("add_water", {"amount_ml": 500}, 2)
+        await do("add_sunlight", {"minutes": 20}, 3)
+        await do("review_calendar", {}, 4)
+        await do("adjust_day", {"reason": "synthetic external change"}, 5)
+        await do("leave_home", {}, 6)
+        await do("complete_chore", {"chore": "synthetic chore"}, 7)
+        await do("shutdown", {}, 8)
+        await do("set_phone_night_state", {"active": False}, 9)
+
+        observed = await runtime.observe(episode_id)
+        assert observed.state["derived"]["wake_deviation_minutes"] == 10
+        assert observed.state["derived"]["routine_standing"] == "ALIVE"
+        assert observed.state["calendar_reviewed"] is True
+        assert observed.state["outside_home"] is True
+        assert observed.state["shutdown_complete"] is True
+        assert runtime.verify_evidence_chain()
+
+    asyncio.run(court())
