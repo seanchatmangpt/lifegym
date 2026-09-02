@@ -29,6 +29,17 @@
 <urn:lifegym:domain:rental> a skos:Concept ; skos:prefLabel "rental" .
 <urn:lifegym:domain:shopping> a skos:Concept ; skos:prefLabel "shopping" .
 <urn:lifegym:domain:team-building> a skos:Concept ; skos:prefLabel "team-building" .
+<urn:lifegym:domain:personal-routine> a skos:Concept ; skos:prefLabel "personal routine" .
+
+<urn:lifegym:concept:wake-target> a skos:Concept ; skos:prefLabel "wake target" .
+<urn:lifegym:concept:admitted-observation> a skos:Concept ; skos:prefLabel "admitted observation" .
+<urn:lifegym:concept:calendar-review> a skos:Concept ; skos:prefLabel "calendar review" .
+<urn:lifegym:concept:day-adjustment> a skos:Concept ; skos:prefLabel "day adjustment" .
+<urn:lifegym:concept:sunlight-exposure> a skos:Concept ; skos:prefLabel "sunlight exposure" .
+<urn:lifegym:concept:outside-home> a skos:Concept ; skos:prefLabel "outside home" .
+<urn:lifegym:concept:shutdown-boundary> a skos:Concept ; skos:prefLabel "shutdown boundary" .
+<urn:lifegym:concept:external-circumstance> a skos:Concept ; skos:prefLabel "external circumstance" .
+<urn:lifegym:concept:counterfactual-day> a skos:Concept ; skos:prefLabel "counterfactual day" .
 
 <urn:lifegym:service:email> a dcat:DataService ; dct:identifier "email" .
 <urn:lifegym:service:calendar> a dcat:DataService ; dct:identifier "calendar" .
