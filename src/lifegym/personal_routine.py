@@ -61,7 +61,7 @@ PERSONAL_ROUTINE_CAPABILITIES = (
     ),
     Capability(
         iri="urn:lifegym:procedure:personal-routine:complete-chore",
-        title='Complete one simulated chore. Payload: {"chore": <str>}.' ,
+        title='Complete one simulated chore. Payload: {"chore": <str>}.',
         consequence=Consequence.DO,
         binding="complete_chore",
     ),
@@ -192,29 +192,6 @@ def _validated_profile(raw: object) -> dict[str, Any]:
 def _derived(profile: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
     targets = profile["targets"]
     goal_status: dict[str, str] = {}
-
-    observations = state["observations"]
-    wake_target = profile.get("wake_target")
-    wake_actual = observations.get("wake_time")
-    wake_deviation: int | None = None
-    if wake_target is not None and wake_actual is not None:
-        if not isinstance(wake_actual, str):
-            goal_status["wake_target"] = "BLOCKED"
-        else:
-            try:
-                wake_deviation = _clock_delta(_parse_hhmm(wake_actual), _parse_hhmm(wake_target))
-            except ValueError:
-                goal_status["wake_target"] = "BLOCKED"
-            else:
-                tolerance = targets.get("wake_tolerance_minutes")
-                goal_status["wake_target"] = (
-                    "OBSERVED"
-                    if tolerance is None
-                    else ("ALIVE" if abs(wake_deviation) <= tolerance else "PARTIAL_ALIVE")
-                )
-    elif wake_target is not None:
-        goal_status["wake_target"] = "UNKNOWN"
-
     configured_required = 0
     satisfied_required = 0
 
@@ -223,6 +200,39 @@ def _derived(profile: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
         configured_required += 1
         goal_status[name] = "ALIVE" if satisfied else "PARTIAL_ALIVE"
         satisfied_required += int(satisfied)
+
+    observations = state["observations"]
+    wake_target = profile.get("wake_target")
+    wake_actual = observations.get("wake_time")
+    wake_deviation: int | None = None
+    wake_tolerance = targets.get("wake_tolerance_minutes")
+    if wake_target is not None and wake_tolerance is not None:
+        configured_required += 1
+        if wake_actual is None:
+            goal_status["wake_target"] = "UNKNOWN"
+        elif not isinstance(wake_actual, str):
+            goal_status["wake_target"] = "BLOCKED"
+        else:
+            try:
+                wake_deviation = _clock_delta(_parse_hhmm(wake_actual), _parse_hhmm(wake_target))
+            except ValueError:
+                goal_status["wake_target"] = "BLOCKED"
+            else:
+                wake_satisfied = abs(wake_deviation) <= float(wake_tolerance)
+                goal_status["wake_target"] = "ALIVE" if wake_satisfied else "PARTIAL_ALIVE"
+                satisfied_required += int(wake_satisfied)
+    elif wake_target is not None and wake_actual is not None:
+        if not isinstance(wake_actual, str):
+            goal_status["wake_target"] = "BLOCKED"
+        else:
+            try:
+                wake_deviation = _clock_delta(_parse_hhmm(wake_actual), _parse_hhmm(wake_target))
+            except ValueError:
+                goal_status["wake_target"] = "BLOCKED"
+            else:
+                goal_status["wake_target"] = "OBSERVED"
+    elif wake_target is not None:
+        goal_status["wake_target"] = "UNKNOWN"
 
     if targets.get("calendar_reviewed") is True:
         require("calendar_reviewed", bool(state["calendar_reviewed"]))
@@ -269,27 +279,46 @@ class PersonalRoutineEnvironment:
         self.environment_id = f"urn:lifegym:personal-routine:environment:{uuid4().hex}"
         self._profile = _validated_profile(profile)
         self._closed = False
-        initial = deepcopy(initial or {})
-        if not isinstance(initial, dict):
+        if initial is None:
+            initial = {}
+        elif not isinstance(initial, dict):
             raise TypeError("REFUSED:INITIAL_STATE_MUST_BE_OBJECT")
+        else:
+            initial = deepcopy(initial)
+
+        observations = initial.get("observations", {})
+        if not isinstance(observations, dict):
+            raise TypeError("REFUSED:OBSERVATIONS_MUST_BE_OBJECT")
+        chores_completed = initial.get("chores_completed", [])
+        if not isinstance(chores_completed, list) or not all(
+            isinstance(item, str) and item for item in chores_completed
+        ):
+            raise TypeError("REFUSED:CHORES_COMPLETED_MUST_BE_STRING_LIST")
+        external_circumstances = initial.get("external_circumstances", [])
+        if not isinstance(external_circumstances, list):
+            raise TypeError("REFUSED:EXTERNAL_CIRCUMSTANCES_MUST_BE_LIST")
+
         self._state: dict[str, Any] = {
             "day": initial.get("day"),
             "work_mode": self._profile["work_mode"],
             "direct_code_allowed": self._profile["direct_code_allowed"],
             "mission_tags": deepcopy(self._profile["mission_tags"]),
-            "observations": deepcopy(initial.get("observations", {})),
-            "water_ml": float(initial.get("water_ml", 0)),
-            "sunlight_minutes": float(initial.get("sunlight_minutes", 0)),
+            "observations": deepcopy(observations),
+            "water_ml": _non_negative_number(
+                initial.get("water_ml", 0), code="REFUSED:INITIAL_WATER_ML_MUST_BE_NON_NEGATIVE"
+            ),
+            "sunlight_minutes": _non_negative_number(
+                initial.get("sunlight_minutes", 0),
+                code="REFUSED:INITIAL_SUNLIGHT_MINUTES_MUST_BE_NON_NEGATIVE",
+            ),
             "calendar_reviewed": bool(initial.get("calendar_reviewed", False)),
             "day_adjustments": int(initial.get("day_adjustments", 0)),
             "outside_home": bool(initial.get("outside_home", False)),
-            "chores_completed": list(initial.get("chores_completed", [])),
+            "chores_completed": list(chores_completed),
             "shutdown_complete": bool(initial.get("shutdown_complete", False)),
             "phone_at_night": bool(initial.get("phone_at_night", False)),
-            "external_circumstances": list(initial.get("external_circumstances", [])),
+            "external_circumstances": deepcopy(external_circumstances),
         }
-        if not isinstance(self._state["observations"], dict):
-            raise TypeError("REFUSED:OBSERVATIONS_MUST_BE_OBJECT")
         self._refresh_derived()
 
     @classmethod
